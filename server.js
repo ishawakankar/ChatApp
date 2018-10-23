@@ -7,7 +7,6 @@ var recastai = require('recastai').default
 //var readline = require('readline-sync');
 var build = new recastai.build('access_token', 'en')
 
-
 users = [];
 connections = [];
 
@@ -26,13 +25,14 @@ io.sockets.on('connection', function (socket) {
         users.splice(users.indexOf(socket.username), 1);
         updateUsernames();
         connections.splice(connections.indexOf(socket), 1);
-        console.log('Disconnected: %s sockets connected', connections.length);
+        console.log('Disconnected: %s sockets disconnected', connections.length);
     });
 
     socket.on('send message', function (data) {
         build.dialog({ type: 'text', content: data }, { conversationId: 'CONVERSATION_ID' })
             .then(function (res) {
-                io.sockets.emit('new message', { msg: data });
+                var name=socket.username;
+                io.sockets.emit('new message', { msg: '<strong>'+name+'</strong>: '+data });
                 io.sockets.emit('new message', { msg: '<strong>Bot</strong>: '
                 +res.messages[0].content });
             })
