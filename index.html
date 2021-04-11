@@ -55,6 +55,7 @@
 
     <div class="navbar navbar-dark bg-primary navbar-fixed-top btn-primary">
         <div class="navbar-brand">RecastAI - Ibot</div>
+        <div id="userLogin" style="text-align: right; padding-right: 3%; padding-top: 2%"></div>
     </div>
     <div class="container">
 
@@ -119,6 +120,7 @@
             var $userFormArea = $('#userFormArea');
             var $users = $('#users');
             var $username = $('#username');
+            var $userLogin = $('#userLogin');
 
             $messageForm.submit(function(e){
                 e.preventDefault();
@@ -128,7 +130,8 @@
 
             socket.on('new message', function(data){
                 $chat.append('<div class="well">'+data.msg+'<div class="date">'
-                    +new Date()
+                    +new Date().toISOString().
+                    replace(/T/, ' ').replace(/\..+/, '')
                     +'</div>'+'</div>'
                 +'<br>'
                 );
@@ -137,6 +140,7 @@
 
             $userForm.submit(function(e){
                 e.preventDefault();
+                document.getElementById('userLogin').innerHTML = $username.val()
                 socket.emit('new user', $username.val(), function(data){
                     if(data){
                         $userFormArea.hide();
@@ -149,14 +153,19 @@
 
             socket.on('get users', function(data) {
                 
-                // var html = '';
-                // for(i = 0;i<data.length;i++)
-                // {
-                //     html+='<li class="list-group-item">'+data[i]+'</li>';
-                // }
+                var html = '';
+                for(i = 0;i<data.length;i++)
+                {
+                    html+='<li class="list-group-item">'+data[i]+'</li>';
+                }
 
-                // console.log(html)
-                $users.text(data)
+                console.log(html)
+                document.getElementById('users').innerHTML = html;
+                // $users.text(data)
+            })
+
+            socket.on('get current user', function(data) {
+                $userLogin.text(data)
             })
         });
     </script>
